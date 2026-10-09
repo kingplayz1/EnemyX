@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnemyX Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: rgba(0, 0, 0, 0.4);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #4cc9f0;
+            font-size: 1.8rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-tab {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .nav-tab.active {
+            background: #4cc9f0;
+            color: #0f3460;
+            border-color: #4cc9f0;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .panel-header h2 {
+            font-size: 1.5rem;
+            color: #4cc9f0;
+        }
+
+        .btn {
+            background: rgba(76, 201, 240, 0.2);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            color: #4cc9f0;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background: rgba(76, 201, 240, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.primary {
+            background: #4cc9f0;
+            color: #0f3460;
+            border-color: #4cc9f0;
+        }
+
+        .btn.primary:hover {
+            background: #3a9bd8;
+        }
+
+        .btn.danger {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+
+        .btn.danger:hover {
+            background: rgba(231, 76, 60, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4cc9f0;
+            box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .table-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .badge.warning {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .badge.danger {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .badge.info {
+            background: rgba(23, 162, 184, 0.2);
+            color: #17a2b8;
+            border: 1px solid rgba(23, 162, 184, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #4cc9f0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .config-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .config-section h3 {
+            margin-bottom: 20px;
+            color: #4cc9f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-section h3 i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .debug-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .debug-line {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .debug-label {
+            color: #00ffff;
+            font-weight: 600;
+        }
+
+        .debug-value {
+            color: #ffffff;
+            margin-left: 10px;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #b0b0b0;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888888;
+            font-style: italic;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #888888;
+        }
+
+        .coord-display {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 10px 0;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 80px;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-tabs {
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 10px;
+                gap: 5px;
+            }
+
+            .main-content {
+                flex: 1;
+                height: calc(100% - 80px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>EnemyX Admin</h2>
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-tab="overview">Overview</div>
+                <div class="nav-tab" data-tab="zones">Zones</div>
+                <div class="nav-tab" data-tab="npcs">NPCs</div>
+                <div class="nav-tab" data-tab="groups">Groups</div>
+                <div class="nav-tab" data-tab="config">Config</div>
+                <div class="nav-tab" data-tab="debug">Debug</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Overview Tab -->
+            <div class="tab-panel active" id="overview-tab">
+                <div class="panel-header">
+                    <h2>System Overview</h2>
+                    <button class="btn" id="refreshOverview">Refresh</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="npcCount">0</div>
+                        <div class="stat-label">Active NPCs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="zoneCount">0</div>
+                        <div class="stat-label">Active Zones</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="entityCount">0</div>
+                        <div class="stat-label">Total Entities</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="uptime">0s</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3><i class="fas fa-server"></i> System Status</h3>
+                    <div id="systemStatus">
+                        <div class="loading">Loading system status...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zones Tab -->
+            <div class="tab-panel" id="zones-tab">
+                <div class="panel-header">
+                    <h2>Zone Management</h2>
+                    <button class="btn primary" id="showZoneCreator">Create Zone</button>
+                </div>
+
+                <div id="zonesList">
+                    <div class="loading">Loading zones...</div>
+                </div>
+
+                <!-- Zone Creator Modal -->
+                <div id="zoneCreatorModal" class="modal">
+                    <div class="modal-content">
+                        <div class="panel-header">
+                            <h2>Create New Zone</h2>
+                            <button class="btn danger" id="closeZoneCreator">×</button>
+                        </div>
+
+                        <form id="zoneCreatorForm">
+                            <div class="form-group">
+                                <label for="zoneName">Zone Name:</label>
+                                <input type="text" id="zoneName" placeholder="Enter zone name (e.g., drug_lab)" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="zoneType">Zone Type:</label>
+                                <select id="zoneType">
+                                    <option value="circle">Circle</option>
+                                    <option value="box">Box</option>
+                                    <option value="polygon">Polygon</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="circleParams">
+                                <label for="zoneCenterX">Center X:</label>
+                                <input type="number" id="zoneCenterX" step="0.1" placeholder="X coordinate">
+                            </div>
+
+                            <div class="form-group" id="circleParams">
+                                <label for="zoneCenterY">Center Y:</label>
+                                <input type="number" id="zoneCenterY" step="0.1" placeholder="Y coordinate">
+                            </div>
+
+                            <div class="form-group" id="circleParams">
+                                <label for="zoneCenterZ">Center Z:</label>
+                                <input type="number" id="zoneCenterZ" step="0.1" placeholder="Z coordinate">
+                            </div>
+
+                            <div class="form-group" id="circleParams">
+                                <label for="zoneRadius">Radius (meters):</label>
+                                <input type="number" id="zoneRadius" min="1" step="0.1" placeholder="Spawn radius">
+                            </div>
+
+                            <div class="form-group" id="boxParams" style="display: none;">
+                                <label for="zoneSizeX">Size X:</label>
+                                <input type="number" id="zoneSizeX" min="1" step="0.1" placeholder="Width">
+                            </div>
+
+                            <div class="form-group" id="boxParams" style="display: none;">
+                                <label for="zoneSizeY">Size Y:</label>
+                                <input type="number" id="zoneSizeY" min="1" step="0.1" placeholder="Height">
+                            </div>
+
+                            <div class="form-group" id="boxParams" style="display: none;">
+                                <label for="zoneHeading">Heading:</label>
+                                <input type="number" id="zoneHeading" min="0" max="360" step="1" placeholder="Rotation degrees">
+                            </div>
+
+                            <div class="form-group" id="polygonParams" style="display: none;">
+                                <label>Polygon Points:</label>
+                                <div id="polygonPoints">
+                                    <div class="point-input">
+                                        <input type="number" class="pointX" step="0.1" placeholder="X">
+                                        <input type="number" class="pointY" step="0.1" placeholder="Y">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn" id="addPoint">Add Point</button>
+                            </div>
+
+                            <hr>
+
+                            <h3>Spawn Settings</h3>
+                            <div class="form-group">
+                                <label>Enable Spawning:</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="enableSpawn" checked>
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="spawnSettings">
+                                <label for="spawnDensity">Spawn Density (0-1):</label>
+                                <input type="number" id="spawnDensity" min="0" max="1" step="0.01" value="0.5">
+                            </div>
+
+                            <div class="form-group" id="spawnSettings">
+                                <label for="spawnInterval">Spawn Interval (ms):</label>
+                                <input type="number" id="spawnInterval" min="1000" value="5000">
+                            </div>
+
+                            <div class="form-group" id="spawnSettings">
+                                <label for="maxNPCs">Max NPCs:</label>
+                                <input type="number" id="maxNPCs" min="0" value="5">
+                            </div>
+
+                            <div class="form-group" id="spawnSettings">
+                                <label for="maxVehicles">Max Vehicles:</label>
+                                <input type="number" id="maxVehicles" min="0" value="2">
+                            </div>
+
+                            <button type="submit" class="btn primary">Create Zone</button>
+                            <button type="button" class="btn" id="cancelZoneCreator">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NPCs Tab -->
+            <div class="tab-panel" id="npcs-tab">
+                <div class="panel-header">
+                    <h2>NPC Management</h2>
+                    <button class="btn primary" id="showNPCSpawner">Spawn NPC</button>
+                    <button class="btn" id="showGroupSpawner">Spawn Group</button>
+                    <button class="btn danger" id="clearNPCs">Clear All NPCs</button>
+                </div>
+
+                <div id="npctableContainer">
+                    <div class="loading">Loading NPCs...</div>
+                </div>
+
+                <!-- NPC Spawner Modal -->
+                <div id="npcSpawnerModal" class="modal">
+                    <div class="modal-content">
+                        <div class="panel-header">
+                            <h2>Spawn NPC</h2>
+                            <button class="btn danger" id="closeNPCSpawner">×</button>
+                        </div>
+
+                        <form id="npcSpawnerForm">
+                            <div class="form-group">
+                                <label for="npcModel">Ped Model:</label>
+                                <input type="text" id="npcModel" placeholder="g_m_y_mexgoon_01" value="g_m_y_mexgoon_01">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="npcWeapon">Primary Weapon:</label>
+                                <input type="text" id="npcWeapon" placeholder="WEAPON_ASSAULTRIFLE" value="WEAPON_ASSAULTRIFLE">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="npcAmmo">Primary Ammo:</label>
+                                <input type="number" id="npcAmmo" min="0" value="250">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="npcSecondaryWeapon">Secondary Weapon:</label>
+                                <input type="text" id="npcSecondaryWeapon" placeholder="WEAPON_PISTOL">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="npcSecondaryAmmo">Secondary Ammo:</label>
+                                <input type="number" id="npcSecondaryAmmo" min="0" value="100">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="npcBehavior">Behavior:</label>
+                                <select id="npcBehavior">
+                                    <option value="passive">Passive</option>
+                                    <option value="aggressive">Aggressive</option>
+                                    <option value="guard">Guard</option>
+                                    <option value="patrol">Patrol</option>
+                                    <option value="investigate">Investigate</option>
+                                    <option value="chase">Chase</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="npcCoordsX">Spawn X:</label>
+                                <input type="number" id="npcCoordsX" step="0.1" placeholder="X coordinate">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="npcCoordsY">Spawn Y:</label>
+                                <input type="number" id="npcCoordsY" step="0.1" placeholder="Y coordinate">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="npcCoordsZ">Spawn Z:</label>
+                                <input type="number" id="npcCoordsZ" step="0.1" placeholder="Z coordinate">
+                            </div>
+
+                            <button type="submit" class="btn primary">Spawn NPC</button>
+                            <button type="button" class="btn" id="cancelNPCSpawner">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Group Spawner Modal -->
+                <div id="groupSpawnerModal" class="modal">
+                    <div class="modal-content">
+                        <div class="panel-header">
+                            <h2>Spawn Group</h2>
+                            <button class="btn danger" id="closeGroupSpawner">×</button>
+                        </div>
+
+                        <form id="groupSpawnerForm">
+                            <div class="form-group">
+                                <label for="groupName">Group Name:</label>
+                                <input type="text" id="groupName" placeholder="cartel_patrol" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="groupCount">Group Size:</label>
+                                <input type="number" id="groupCount" min="1" max="10" value="3">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="groupCoordsX">Spawn X:</label>
+                                <input type="number" id="groupCoordsX" step="0.1" placeholder="X coordinate">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="groupCoordsY">Spawn Y:</label>
+                                <input type="number" id="groupCoordsY" step="0.1" placeholder="Y coordinate">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="groupCoordsZ">Spawn Z:</label>
+                                <input type="number" id="groupCoordsZ" step="0.1" placeholder="Z coordinate">
+                            </div>
+
+                            <button type="submit" class="btn primary">Spawn Group</button>
+                            <button type="button" class="btn" id="cancelGroupSpawner">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groups Tab -->
+            <div class="tab-panel" id="groups-tab">
+                <div class="panel-header">
+                    <h2>Group Management</h2>
+                    <button class="btn primary" id="refreshGroups">Refresh</button>
+                </div>
+
+                <div id="groupsList">
+                    <div class="loading">Loading groups...</div>
+                </div>
+            </div>
+
+            <!-- Config Tab -->
+            <div class="tab-panel" id="config-tab">
+                <div class="panel-header">
+                    <h2>Configuration Editor</h2>
+                    <button class="btn" id="reloadConfig">Reload Config</button>
+                </div>
+
+                <div class="config-section">
+                    <h3><i class="fas fa-edit"></i> Edit Configuration</h3>
+                    <div class="form-group">
+                        <label for="configKey">Configuration Key:</label>
+                        <input type="text" id="configKey" placeholder="e.g., Performance.highDistance" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="configValue">Value:</label>
+                        <input type="text" id="configValue" placeholder="Enter new value" required>
+                    </div>
+
+                    <button type="submit" class="btn primary" id="updateConfigBtn">Update Configuration</button>
+                </div>
+
+                <div class="config-section">
+                    <h3><i class="fas fa-file-alt"></i> Current Configuration</h3>
+                    <div id="configDisplay" class="debug-panel">
+                        <div class="loading">Loading configuration...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Debug Tab -->
+            <div class="tab-panel" id="debug-tab">
+                <div class="panel-header">
+                    <h2>Debug Information</h2>
+                    <button class="btn" id="toggleDebugOverlay">Toggle Debug Overlay</button>
+                    <button class="btn" id="refreshDebug">Refresh Debug</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="debugUpdateRate">0ms</div>
+                        <div class="stat-label">Update Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="debugEntityCount">0</div>
+                        <div class="stat-label">Entities Tracked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="debugZoneChecks">0/sec</div>
+                        <div class="stat-label">Zone Checks/sec</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="debugMemory">0MB</div>
+                        <div class="stat-label">Memory Usage</div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3><i class="fas fa-bug"></i> Live Debug Info</h3>
+                    <div id="debugDisplay" class="debug-panel">
+                        <div class="loading">Loading debug info...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modalsContainer"></div>
+
+    <div class="footer">
+        EnemyX v1.0.0 • Universal AI Encounter Framework
+    </div>
+
+    <script>
+        // Simple state management for the admin panel
+        let currentTab = 'overview';
+        let updateInterval = null;
+        let lastUpdateTime = 0;
+
+        // DOM Elements
+        const navTabs = document.querySelectorAll('.nav-tab');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        const modalsContainer = document.getElementById('modalsContainer');
+
+        // Initialize the admin panel
+        document.addEventListener('DOMContentLoaded', function() {
+            initAdminPanel();
+            startAutoUpdates();
+        });
+
+        function initAdminPanel() {
+            // Tab switching
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+
+            // Close modals when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal')) {
+                    hideModal(e.target);
+                }
+            });
+
+            // Initialize forms
+            initZoneCreatorForm();
+            initNPCSpawnerForm();
+            initGroupSpawnerForm();
+            initConfigForm();
+
+            // Initial data load
+            refreshAllData();
+        }
+
+        function switchTab(tabName) {
+            // Update active tab
+            navTabs.forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('data-tab') === tabName);
+            });
+
+            // Update active panel
+            tabPanels.forEach(panel => {
+                panel.classList.toggle('active', panel.id === tabName + '-tab');
+            });
+
+            currentTab = tabName;
+
+            // Refresh data for the new tab
+            if (Date.now() - lastUpdateTime > 2000) { // Avoid too frequent updates
+                refreshTabData(tabName);
+            }
+        }
+
+        function startAutoUpdates() {
+            updateInterval = setInterval(function() {
+                if (Date.now() - lastUpdateTime > 5000) { // Update every 5 seconds max
+                    refreshTabData(currentTab);
+                }
+            }, 5000);
+        }
+
+        function refreshTabData(tabName) {
+            lastUpdateTime = Date.now();
+
+            switch(tabName) {
+                case 'overview':
+                    refreshOverviewData();
+                    break;
+                case 'zones':
+                    refreshZonesData();
+                    break;
+                case 'npcs':
+                    refreshNPCsData();
+                    break;
+                case 'groups':
+                    refreshGroupsData();
+                    break;
+                case 'config':
+                    refreshConfigData();
+                    break;
+                case 'debug':
+                    refreshDebugData();
+                    break;
+            }
+        }
+
+        function refreshAllData() {
+            refreshOverviewData();
+            refreshZonesData();
+            refreshNPCsData();
+            refreshGroupsData();
+            refreshConfigData();
+            refreshDebugData();
+        }
+
+        // Data refresh functions
+        function refreshOverviewData() {
+            fetch('/enemyx:client:getAdminData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.status) {
+                    document.getElementById('npcCount').textContent = data.enemies.length;
+                    document.getElementById('zoneCount').textContent = data.zones.length;
+                    document.getElementById('entityCount').textContent = data.enemies.length; // Simplified
+
+                    const uptimeSeconds = Math.floor((Date.now() - data.timestamp) / 1000);
+                    document.getElementById('uptime').textContent = `${uptimeSeconds}s`;
+
+                    // Update system status
+                    const statusHTML = `
+                        <div><strong>Framework:</strong> ${data.config.Framework || 'unknown'}</div>
+                        <div><strong>Auto Director:</strong> ${data.config.AutoDirector?.enabled ? 'Enabled' : 'Disabled'}</div>
+                        <div><strong>Debug Mode:</strong> ${data.config.Debug ? 'On' : 'Off'}</div>
+                    `;
+                    document.getElementById('systemStatus').innerHTML = statusHTML;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching overview data:', error);
+                document.getElementById('systemStatus').innerHTML = '<div class="error">Error loading data</div>';
+            });
+        }
+
+        function refreshZonesData() {
+            fetch('/enemyx:client:getAdminData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                const zonesContainer = document.getElementById('zonesList');
+                if (!data || !data.zones) {
+                    zonesContainer.innerHTML = '<div class="no-data">No zones found</div>';
+                    return;
+                }
+
+                if (data.zones.length === 0) {
+                    zonesContainer.innerHTML = '<div class="no-data">No zones configured</div>';
+                    return;
+                }
+
+                let html = '<table><thead><tr>';
+                html += '<th>Name</th><th>Type</th><th>Center</th><th>Radius/Size</th><th>Spawn</th><th>NPCs/Vehicles</th><th>Actions</th>';
+                html += '</tr></thead><tbody>';
+
+                data.zones.forEach(zone => {
+                    const center = zone.center ? `${zone.center.x.toFixed(1)}, ${zone.center.y.toFixed(1)}, ${zone.center.z?.toFixed(1) ?? '0'}` : 'N/A';
+                    const size = zone.radius !== undefined
+                        ? `${zone.radius.toFixed(1)}m`
+                        : `${zone.sizeX?.toFixed(0) ?? 0} x ${zone.sizeY?.toFixed(0) ?? 0}`;
+                    const spawnStatus = zone.spawnEnabled ?
+                        `<span class="badge success">Enabled</span>` :
+                        `<span class="badge danger">Disabled</span>`;
+                    const counts = `${zone.currentNPCs}/${zone.maxNPCs} NPCs, ${zone.currentVehicles}/${zone.maxVehicles} Vehicles`;
+
+                    html += `<tr>
+                        <td>${zone.name}</td>
+                        <td>${zone.type}</td>
+                        <td>${center}</td>
+                        <td>${size}</td>
+                        <td>${spawnStatus}</td>
+                        <td>${counts}</td>
+                        <td>
+                            <button class="btn btn-sm danger" onclick="deleteZone('${zone.name}')">Delete</button>
+                        </td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table>';
+                zonesContainer.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error fetching zones data:', error);
+                document.getElementById('zonesList').innerHTML = '<div class="error">Error loading zones</div>';
+            });
+        }
+
+        function refreshNPCsData() {
+            fetch('/enemyx:client:getAdminData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                const npctableContainer = document.getElementById('npctableContainer');
+                if (!data || !data.enemies) {
+                    npctableContainer.innerHTML = '<div class="no-data">No NPCs found</div>';
+                    return;
+                }
+
+                if (data.enemies.length === 0) {
+                    npctableContainer.innerHTML = '<div class="no-data">No NPCs spawned</div>';
+                    return;
+                }
+
+                let html = '<table><thead><tr>';
+                html += '<th>Model</th><th>Weapon</th><th>Behavior</th><th>Health</th><th>Position</th><th>Actions</th>';
+                html += '</tr></thead><tbody>';
+
+                data.enemies.forEach(enemy => {
+                    const position = enemy.coords ?
+                        `${enemy.coords.x.toFixed(1)}, ${enemy.coords.y.toFixed(1)}, ${enemy.coords.z?.toFixed(1) ?? '0'}` :
+                        'Unknown';
+
+                    html += `<tr>
+                        <td>${enemy.model}</td>
+                        <td>${enemy.weapon}</td>
+                        <td><span class="badge info">${enemy.behavior}</span></td>
+                        <td>${enemy.health}/${enemy.maxHealth}</td>
+                        <td>${position}</td>
+                        <td>
+                            <button class="btn btn-sm danger" onclick="removeNPC('${enemy.id}')">Remove</button>
+                        </td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table>';
+                npctableContainer.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error fetching NPCs data:', error);
+                npctableContainer.innerHTML = '<div class="error">Error loading NPCs</div>';
+            });
+        }
+
+        function refreshGroupsData() {
+            // Groups data would come from a separate endpoint
+            // For now, show placeholder
+            document.getElementById('groupsList').innerHTML =
+                '<div class="no-data">Group management coming in V2</div>';
+        }
+
+        function refreshConfigData() {
+            fetch('/enemyx:client:getAdminData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.config) {
+                    // Format config as JSON for display
+                    const configStr = JSON.stringify(data.config, null, 2);
+                    document.getElementById('configDisplay').textContent = configStr;
+                } else {
+                    document.getElementById('configDisplay').textContent = 'No configuration data available';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching config data:', error);
+                document.getElementById('configDisplay').textContent = 'Error loading configuration';
+            });
+        }
+
+        function refreshDebugData() {
+            fetch('/enemyx:client:getAdminData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.debug) {
+                    // Update debug stats
+                    document.getElementById('debugUpdateRate').textContent =
+                        (data.debug.updateRate || 0) + 'ms';
+                    document.getElementById('debugEntityCount').textContent =
+                        data.debug.entityCount || 0;
+                    document.getElementById('debugZoneChecks').textContent =
+                        (data.debug.zoneChecks || 0) + '/sec';
+                    document.getElementById('debugMemory').textContent =
+                        ((data.debug.memory || 0) / 1024 / 1024).toFixed(1) + 'MB';
+
+                    // Update debug display
+                    const debugLines = [];
+                    for (const [key, value] of Object.entries(data.debug)) {
+                        if (key !== 'updateRate' && key !== 'entityCount' &&
+                            key !== 'zoneChecks' && key !== 'memory') {
+                            debugLines.push(`<div class="debug-line"><span class="debug-label">${key}:</span> <span class="debug-value">${value}</span></div>`);
+                        }
+                    }
+                    document.getElementById('debugDisplay').innerHTML = debugLines.join('');
+                } else {
+                    document.getElementById('debugDisplay').innerHTML =
+                        '<div class="loading">No debug data available</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching debug data:', error);
+                document.getElementById('debugDisplay').innerHTML =
+                    '<div class="error">Error loading debug data</div>';
+            });
+        }
+
+        // Modal functions
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'block';
+                // Focus first input
+                setTimeout(() => {
+                    const firstInput = modal.querySelector('input, select, textarea');
+                    if (firstInput) firstInput.focus();
+                }, 100);
+            }
+        }
+
+        function hideModal(modal) {
+            modal.style.display = 'none';
+            // Reset form
+            modal.querySelector('form')?.reset();
+        }
+
+        // Form initializations
+        function initZoneCreatorForm() {
+            const form = document.getElementById('zoneCreatorForm');
+            const modal = document.getElementById('zoneCreatorModal');
+
+            // Zone type switching
+            document.getElementById('zoneType').addEventListener('change', function() {
+                const type = this.value;
+                document.getElementById('circleParams').style.display = type === 'circle' ? 'block' : 'none';
+                document.getElementById('boxParams').style.display = type === 'box' ? 'block' : 'none';
+                document.getElementById('polygonParams').style.display = type === 'polygon' ? 'block' : 'none';
+
+                // Show/hide spawn settings based on type
+                document.getElementById('spawnSettings').style.display =
+                    ['circle', 'box', 'polygon'].includes(type) ? 'block' : 'none';
+            });
+
+            // Add point button for polygon
+            document.getElementById('addPoint').addEventListener('click', function() {
+                const pointDiv = document.createElement('div');
+                pointDiv.className = 'point-input';
+                pointDiv.innerHTML = `
+                    <input type="number" class="pointX" step="0.1" placeholder="X">
+                    <input type="number" class="pointY" step="0.1" placeholder="Y">
+                    <button type="button" class="btn btn-sm danger" onclick="this.parentElement.remove()">Remove</button>
+                `;
+                document.getElementById('polygonPoints').appendChild(pointDiv);
+            });
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const zoneType = document.getElementById('zoneType').value;
+                let zoneData = {
+                    name: document.getElementById('zoneName').value.trim(),
+                    type: zoneType
+                };
+
+                if (zoneType === 'circle') {
+                    zoneData.center = {
+                        x: parseFloat(document.getElementById('zoneCenterX').value) || 0,
+                        y: parseFloat(document.getElementById('zoneCenterY').value) || 0,
+                        z: parseFloat(document.getElementById('zoneCenterZ').value) || 0
+                    };
+                    zoneData.radius = parseFloat(document.getElementById('zoneRadius').value) || 50;
+                } else if (zoneType === 'box') {
+                    zoneData.center = {
+                        x: parseFloat(document.getElementById('zoneCenterX').value) || 0,
+                        y: parseFloat(document.getElementById('zoneCenterY').value) || 0,
+                        z: parseFloat(document.getElementById('zoneCenterZ').value) || 0
+                    };
+                    zoneData.sizeX = parseFloat(document.getElementById('zoneSizeX').value) || 100;
+                    zoneData.sizeY = parseFloat(document.getElementById('zoneSizeY').value) || 100;
+                    zoneData.heading = parseFloat(document.getElementById('zoneHeading').value) || 0;
+                } else if (zoneType === 'polygon') {
+                    const points = [];
+                    document.querySelectorAll('#polygonPoints .point-input').forEach(pointDiv => {
+                        const x = parseFloat(pointDiv.querySelector('.pointX').value) || 0;
+                        const y = parseFloat(pointDiv.querySelector('.pointY').value) || 0;
+                        points.push({x, y});
+                    });
+                    if (points.length >= 3) {
+                        zoneData.points = points;
+                    } else {
+                        alert('Polygon must have at least 3 points');
+                        return;
+                    }
+                }
+
+                // Spawn settings
+                if document.getElementById('enableSpawn').checked {
+                    zoneData.spawn = {
+                        enabled: true,
+                        radius: parseFloat(document.getElementById('spawnRadius').value) || 50,
+                        minDistance: parseFloat(document.getElementById('minDistance').value) || 20,
+                        maxDistance: parseFloat(document.getElementById('maxDistance').value) || 100,
+                        maxNPCs: parseInt(document.getElementById('maxNPCs').value) || 5,
+                        maxVehicles: parseInt(document.getElementById('maxVehicles').value) || 2,
+                        density: parseFloat(document.getElementById('spawnDensity').value) || 0.5,
+                        interval: parseInt(document.getElementById('spawnInterval').value) || 5000
+                    };
+                } else {
+                    zoneData.spawn = { enabled: false };
+                }
+
+                // Send to server
+                fetch('/enemyx:client:createZone', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(zoneData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        hideModal(modal);
+                        refreshZonesData();
+                        showNotification('Zone created successfully!', 'success');
+                    } else {
+                        throw new Error('Failed to create zone');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error creating zone:', error);
+                    showNotification('Failed to create zone: ' + error.message, 'error');
+                });
+            });
+
+            // Cancel button
+            document.getElementById('cancelZoneCreator').addEventListener('click', function() {
+                hideModal(modal);
+            });
+
+            // Close button
+            document.getElementById('closeZoneCreator').addEventListener('click', function() {
+                hideModal(modal);
+            });
+        }
+
+        function initNPCSpawnerForm() {
+            const form = document.getElementById('npcSpawnerForm');
+            const modal = document.getElementById('npcSpawnerModal');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const npcData = {
+                    model: document.getElementById('npcModel').value.trim() || 'a_m_m_business_01',
+                    weapon: document.getElementById('npcWeapon').value.trim() || 'WEAPON_PISTOL',
+                    ammo: parseInt(document.getElementById('npcAmmo').value) || 30,
+                    secondaryWeapon: document.getElementById('npcSecondaryWeapon').value.trim() || null,
+                    secondaryAmmo: document.getElementById('npcSecondaryAmmo').value ?
+                        parseInt(document.getElementById('npcSecondaryAmmo').value) : null,
+                    behavior: document.getElementById('npcBehavior').value,
+                    coords: {
+                        x: parseFloat(document.getElementById('npcCoordsX').value) || 0,
+                        y: parseFloat(document.getElementById('npcCoordsY').value) || 0,
+                        z: parseFloat(document.getElementById('npcCoordsZ').value) || 0
+                    }
+                };
+
+                // Send to server
+                fetch('/enemyx:client:spawnNPC', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(npcData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        hideModal(modal);
+                        refreshNPCsData();
+                        showNotification('NPC spawned successfully!', 'success');
+                    } else {
+                        throw new Error('Failed to spawn NPC');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error spawning NPC:', error);
+                    showNotification('Failed to spawn NPC: ' + error.message, 'error');
+                });
+            });
+
+            // Cancel button
+            document.getElementById('cancelNPCSpawner').addEventListener('click', function() {
+                hideModal(modal);
+            });
+
+            // Close button
+            document.getElementById('closeNPCSpawner').addEventListener('click', function() {
+                hideModal(modal);
+            });
+        }
+
+        function initGroupSpawnerForm() {
+            const form = document.getElementById('groupSpawnerForm');
+            const modal = document.getElementById('groupSpawnerModal');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const groupData = {
+                    groupName: document.getElementById('groupName').value.trim(),
+                    count: parseInt(document.getElementById('groupCount').value) || 1,
+                    coords: {
+                        x: parseFloat(document.getElementById('groupCoordsX').value) || 0,
+                        y: parseFloat(document.getElementById('groupCoordsY').value) || 0,
+                        z: parseFloat(document.getElementById('groupCoordsZ').value) || 0
+                    }
+                };
+
+                // Send to server
+                fetch('/enemyx:client:spawnGroup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(groupData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        hideModal(modal);
+                        refreshNPCsData(); // Groups spawn NPCs, so refresh NPC list
+                        showNotification(`Group spawned successfully! (${groupData.count} NPCs)`, 'success');
+                    } else {
+                        throw new Error('Failed to spawn group');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error spawning group:', error);
+                    showNotification('Failed to spawn group: ' + error.message, 'error');
+                });
+            });
+
+            // Cancel button
+            document.getElementById('cancelGroupSpawner').addEventListener('click', function() {
+                hideModal(modal);
+            });
+
+            // Close button
+            document.getElementById('closeGroupSpawner').addEventListener('click', function() {
+                hideModal(modal);
+            });
+        }
+
+        function initConfigForm() {
+            const form = document.getElementById('updateConfigForm');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const key = document.getElementById('configKey').value.trim();
+                let value = document.getElementById('configValue').value.trim();
+
+                // Try to parse as JSON if it looks like an object or array
+                if ((value.startsWith('{') && value.endsWith('}')) ||
+                    (value.startsWith('[') && value.endsWith(']'))) {
+                    try {
+                        value = JSON.parse(value);
+                    } catch(e) {
+                        // Keep as string if parsing fails
+                    }
+                } else {
+                    // Try to parse as number
+                    const numValue = parseFloat(value);
+                    if (!isNaN(numValue)) {
+                        value = numValue;
+                    }
+                    // Try to parse as boolean
+                    else if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
+                        value = value.toLowerCase() === 'true';
+                    }
+                }
+
+                // Send to server
+                fetch('/enemyx:client:updateConfig', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ key, value })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showNotification('Configuration updated successfully!', 'success');
+                        refreshConfigData(); // Refresh config display
+                        // Reset form
+                        form.reset();
+                    } else {
+                        throw new Error('Failed to update configuration');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating config:', error);
+                    showNotification('Failed to update configuration: ' + error.message, 'error');
+                });
+            });
+        }
+
+        // Helper functions
+        function showNotification(message, type = 'info') {
+            // In a real implementation, this would use a notification system
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            // Could also show a toast notification
+        }
+
+        function deleteZone(zoneName) {
+            if (!confirm(`Are you sure you want to delete zone "${zoneName}"?`)) {
+                return;
+            }
+
+            fetch(`/enemyx:client:removeZone?name=${encodeURIComponent(zoneName)}`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    refreshZonesData();
+                    showNotification(`Zone "${zoneName}" deleted successfully!`, 'success');
+                } else {
+                    throw new Error('Failed to delete zone');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting zone:', error);
+                showNotification('Failed to delete zone: ' + error.message, 'error');
+            });
+        }
+
+        function removeNPC(npcId) {
+            if (!confirm(`Are you sure you want to remove NPC ${npcId}?`)) {
+                return;
+            }
+
+            fetch(`/enemyx:client:removeNPC?id=${encodeURIComponent(npcId)}`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    refreshNPCsData();
+                    showNotification(`NPC ${npcId} removed successfully!`, 'success');
+                } else {
+                    throw new Error('Failed to remove NPC');
+                }
+            })
+            .catch(error => {
+                console.error('Error removing NPC:', error);
+                showNotification('Failed to remove NPC: ' + error.message, 'error');
+            });
+        }
+
+        // Expose functions to global scope for NUI callbacks
+        window.showModal = showModal;
+        window.hideModal = hideModal;
+        window.deleteZone = deleteZone;
+        window.removeNPC = removeNPC;
+        window.switchTab = switchTab;
+    </script>
+
+    <!-- Font Awesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</body>
+</html>
